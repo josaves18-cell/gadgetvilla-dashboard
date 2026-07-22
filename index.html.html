@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="./config.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans Thai','Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#2563eb;text-decoration:none}
+  a:hover{color:#1d4ed8}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#c7cdd9;border-radius:6px}
+  @keyframes gv-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes gv-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes gv-spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;background:{{ pageBg }};color:{{ ink }};font-family:'Noto Sans Thai','Inter',sans-serif;transition:background .3s">
+
+  <aside style="width:{{ navW }};flex:0 0 {{ navW }};background:{{ sideBg }};color:#cdd5e5;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;transition:width .25s">
+    <div style="display:flex;align-items:center;gap:11px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div style="width:38px;height:38px;flex:0 0 38px;border-radius:9px;background:linear-gradient(135deg,#facc15,#f59e0b);display:flex;align-items:center;justify-content:center;color:#1e293b;font-weight:800;font-size:19px;font-family:Inter">GV</div>
+      <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="font-weight:800;font-size:16px;letter-spacing:.5px;color:#fff;font-family:Inter">GADGET VILLA</span></sc-if>
+    </div>
+    <nav style="flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:4px">
+      <sc-for list="{{ menu }}" as="m" hint-placeholder-count="8">
+        <a href="#" onClick="{{ m.go }}" title="{{ m.label }}" style="{{ m.style }}">
+          <i class="{{ m.icon }}" style="width:20px;text-align:center;font-size:15px"></i>
+          <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span style="font-size:14.5px;font-weight:500">{{ m.label }}</span></sc-if>
+        </a>
+      </sc-for>
+    </nav>
+    <div style="padding:14px 14px 8px">
+      <div style="display:flex;gap:6px;background:rgba(255,255,255,.06);padding:5px;border-radius:11px">
+        <button onClick="{{ setLight }}" style="{{ lightBtn }}"><i class="fa-solid fa-sun"></i><sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span>Light</span></sc-if></button>
+        <button onClick="{{ setDark }}" style="{{ darkBtn }}"><i class="fa-solid fa-moon"></i><sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span>Dark</span></sc-if></button>
+      </div>
+    </div>
+    <button onClick="{{ toggleNav }}" style="display:flex;align-items:center;gap:9px;padding:15px 22px;background:none;border:none;border-top:1px solid rgba(255,255,255,.07);color:#8b97ae;cursor:pointer;font-family:inherit;font-size:13px">
+      <i class="{{ collapseIcon }}"></i><sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}"><span>ซ่อนเมนู</span></sc-if>
+    </button>
+  </aside>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="display:flex;align-items:center;gap:16px;padding:16px 26px;background:{{ cardBg }};border-bottom:1px solid {{ line }};position:sticky;top:0;z-index:20">
+      <div style="display:flex;align-items:center;gap:11px;min-width:250px">
+        <div style="width:34px;height:34px;border-radius:9px;background:{{ softBlue }};color:#2563eb;display:flex;align-items:center;justify-content:center"><i class="{{ headIcon }}"></i></div>
+        <span style="font-size:19px;font-weight:700;color:{{ ink }}">{{ headTitle }}</span>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <div style="{{ pill }}"><i class="fa-regular fa-calendar" style="color:#64748b"></i><span>1 มิ.ย. 2569 - 30 มิ.ย. 2569</span><i class="fa-solid fa-chevron-down" style="color:#94a3b8;font-size:11px"></i></div>
+        <div style="{{ pill }}"><span>ทุกร้านค้า</span><i class="fa-solid fa-chevron-down" style="color:#94a3b8;font-size:11px"></i></div>
+        <div style="{{ pill }}"><span>พนักงานทั้งหมด</span><i class="fa-solid fa-chevron-down" style="color:#94a3b8;font-size:11px"></i></div>
+        <button style="display:flex;align-items:center;gap:8px;background:#2563eb;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(37,99,235,.35)"><i class="fa-solid fa-download"></i>ส่งออกข้อมูล</button>
+        <div style="position:relative;width:40px;height:40px;border-radius:10px;background:{{ softBg }};display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="fa-regular fa-bell" style="color:#64748b"></i><span style="position:absolute;top:5px;right:6px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px">5</span></div>
+        <div style="display:flex;align-items:center;gap:9px;cursor:pointer">
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#93c5fd,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff"><i class="fa-solid fa-user"></i></div>
+          <div style="line-height:1.25"><div style="font-size:13.5px;font-weight:700;color:{{ ink }}">Admin</div><div style="font-size:11.5px;color:#94a3b8">ผู้ดูแลระบบ</div></div>
+          <i class="fa-solid fa-chevron-down" style="color:#94a3b8;font-size:11px"></i>
+        </div>
+      </div>
+    </header>
+
+    <div style="padding:22px 26px 40px;flex:1">
+
+      <!-- ===== DASHBOARD 1 : SALES ===== -->
+      <sc-if value="{{ isSales }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:16px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="7">
+            <div style="{{ cardStyle }}" style-hover="transform:translateY(-3px);box-shadow:0 10px 26px rgba(15,23,42,.12)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <span style="font-size:12.5px;color:{{ muted }};font-weight:500;line-height:1.35">{{ k.label }}</span>
+                <div style="width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:{{ k.iconBg }};color:{{ k.iconFg }};display:flex;align-items:center;justify-content:center"><i class="{{ k.icon }}"></i></div>
+              </div>
+              <div style="font-size:26px;font-weight:800;font-family:Inter;margin-top:10px;color:{{ k.valColor }}">{{ k.value }}</div>
+              <sc-if value="{{ k.bar }}" hint-placeholder-val="{{ true }}">
+                <div style="height:6px;border-radius:4px;background:{{ track }};margin-top:12px;overflow:hidden"><div style="height:100%;width:{{ k.barPct }};background:#2563eb;border-radius:4px;transform-origin:left;animation:gv-grow 1s ease"></div></div>
+              </sc-if>
+              <div style="font-size:11.5px;color:{{ muted }};margin-top:9px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:16px">
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelH }}">ร้านที่ลูกค้าทักมากที่สุด (Top 5)</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }};width:34px">อันดับ</th><th style="{{ th }}">ร้านค้า</th><th style="{{ thR }}">จำนวนแชท (ไม่ซ้ำ)</th><th style="{{ thR }}">% ของทั้งหมด</th></tr></thead>
+              <tbody><sc-for list="{{ topChat }}" as="r" hint-placeholder-count="5"><tr style="{{ trStyle }}"><td style="{{ tdRank }}">{{ r.rank }}</td><td style="{{ td }}">{{ r.name }}</td><td style="{{ tdR }}">{{ r.n }}</td><td style="{{ tdPctCell }}"><span style="display:inline-block;width:{{ r.w }};max-width:70px;height:5px;border-radius:3px;background:#2563eb;margin-right:8px;vertical-align:middle"></span>{{ r.pct }}</td></tr></sc-for></tbody>
+            </table>
+            <div style="{{ seeAll }}">ดูทั้งหมด <i class="fa-solid fa-chevron-right" style="font-size:10px"></i></div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelH }}">ร้านที่มียอดขายสูงที่สุด (Top 5)</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }};width:34px">อันดับ</th><th style="{{ th }}">ร้านค้า</th><th style="{{ thR }}">ยอดขาย (บาท)</th><th style="{{ thR }}">% ของทั้งหมด</th></tr></thead>
+              <tbody><sc-for list="{{ topSales }}" as="r" hint-placeholder-count="5"><tr style="{{ trStyle }}"><td style="{{ tdRank }}">{{ r.rank }}</td><td style="{{ td }}">{{ r.name }}</td><td style="{{ tdR }}">{{ r.n }}</td><td style="{{ tdPctCell }}"><span style="display:inline-block;width:{{ r.w }};max-width:70px;height:5px;border-radius:3px;background:#16a34a;margin-right:8px;vertical-align:middle"></span>{{ r.pct }}</td></tr></sc-for></tbody>
+            </table>
+            <div style="{{ seeAll }}">ดูทั้งหมด <i class="fa-solid fa-chevron-right" style="font-size:10px"></i></div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelH }}">สรุปผลการทำงานของพนักงาน</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }};width:34px">อันดับ</th><th style="{{ th }}">พนักงาน</th><th style="{{ thR }}">จำนวนสนทนา</th><th style="{{ thR }}">% ปิดการขาย</th><th style="{{ thR }}">ยอดขาย</th></tr></thead>
+              <tbody><sc-for list="{{ staff }}" as="r" hint-placeholder-count="5"><tr style="{{ trStyle }}"><td style="{{ tdRank }}">{{ r.rank }}</td><td style="{{ td }}"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:26px;height:26px;border-radius:50%;background:{{ r.av }};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px"><i class="fa-solid fa-user"></i></span>{{ r.name }}</span></td><td style="{{ tdR }}">{{ r.chats }}</td><td style="{{ tdR }}">{{ r.close }}</td><td style="{{ tdR }}">{{ r.sales }}</td></tr></sc-for></tbody>
+            </table>
+            <div style="{{ seeAll }}">ดูทั้งหมด <i class="fa-solid fa-chevron-right" style="font-size:10px"></i></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.35fr 1fr 1fr 1.1fr;gap:16px">
+          <div style="{{ panelStyle }}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <h3 style="{{ panelHb }}">แนวโน้มยอดขาย</h3>
+              <div style="display:flex;gap:4px;background:{{ softBg }};padding:4px;border-radius:9px">
+                <sc-for list="{{ trendTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+              </div>
+            </div>
+            <div style="position:relative;height:250px"><canvas ref="{{ trendRef }}"></canvas></div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">Sales Funnel</h3>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:14px">
+              <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="4">
+                <div style="width:{{ f.w }};background:{{ f.color }};color:#fff;text-align:center;padding:14px 8px;clip-path:polygon(6% 0,94% 0,86% 100%,14% 100%);line-height:1.3">
+                  <div style="font-size:12.5px;font-weight:600">{{ f.label }}</div>
+                  <div style="font-size:14px;font-weight:800;font-family:Inter;margin-top:2px">{{ f.val }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">อัตราการตอบกลับภายในเวลา</h3>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+              <div style="position:relative;width:130px;height:130px;flex:0 0 130px"><canvas ref="{{ slaRef }}"></canvas></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ sla }}" as="s" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:7px;font-size:12px"><span style="width:11px;height:11px;border-radius:3px;background:{{ s.color }};flex:0 0 11px"></span><span style="flex:1;color:{{ ink }}">{{ s.label }}</span><span style="font-weight:700;color:{{ ink }};font-family:Inter">{{ s.pct }}</span></div></sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">ช่วงเวลาที่มีแชทเข้ามากที่สุด</h3>
+            <div style="margin-top:12px">
+              <div style="display:grid;grid-template-columns:70px repeat(7,1fr);gap:4px;font-size:10px;color:{{ muted }};text-align:center;margin-bottom:5px"><span></span><sc-for list="{{ heatDays }}" as="d" hint-placeholder-count="7"><span>{{ d }}</span></sc-for></div>
+              <sc-for list="{{ heat }}" as="row" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:70px repeat(7,1fr);gap:4px;margin-bottom:4px;align-items:center">
+                  <span style="font-size:10px;color:{{ muted }};font-family:Inter">{{ row.time }}</span>
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7"><div title="{{ c.v }}" style="height:22px;border-radius:4px;background:{{ c.color }}"></div></sc-for>
+                </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:8px;font-size:10px;color:{{ muted }}">น้อย<span style="display:inline-flex;gap:2px"><i style="width:12px;height:10px;background:#dbeafe;border-radius:2px"></i><i style="width:12px;height:10px;background:#93c5fd;border-radius:2px"></i><i style="width:12px;height:10px;background:#3b82f6;border-radius:2px"></i><i style="width:12px;height:10px;background:#1d4ed8;border-radius:2px"></i></span>มาก</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.5fr 1.2fr;gap:16px">
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">ลูกค้าใหม่ vs ลูกค้าเก่า</h3>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+              <div style="position:relative;width:135px;height:135px;flex:0 0 135px"><canvas ref="{{ custRef }}"></canvas></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px"><span style="width:12px;height:12px;border-radius:3px;background:#2563eb"></span><span style="color:{{ ink }}">ลูกค้าใหม่</span><span style="margin-left:auto;font-weight:700;font-family:Inter;color:{{ ink }}">{{ custNewTxt }}</span></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px"><span style="width:12px;height:12px;border-radius:3px;background:#22c55e"></span><span style="color:{{ ink }}">ลูกค้าเก่า</span><span style="margin-left:auto;font-weight:700;font-family:Inter;color:{{ ink }}">{{ custOldTxt }}</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">อัตราการปิดการขายแยกร้านค้า (6 เดือนล่าสุด)</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }}"></th><sc-for list="{{ heatMonths }}" as="m" hint-placeholder-count="6"><th style="{{ thC }}">{{ m }}</th></sc-for></tr></thead>
+              <tbody><sc-for list="{{ closeGrid }}" as="row" hint-placeholder-count="5"><tr><td style="{{ td }}">{{ row.name }}</td><sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="6"><td style="padding:6px 4px"><div style="text-align:center;padding:6px 2px;border-radius:6px;font-size:12px;font-weight:600;font-family:Inter;background:{{ c.color }};color:{{ c.fg }}">{{ c.v }}</div></td></sc-for></tr></sc-for></tbody>
+            </table>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">สรุปข้อมูลรวม</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:12px">
+              <sc-for list="{{ summary }}" as="s" hint-placeholder-count="4">
+                <div style="background:{{ softBg }};border-radius:12px;padding:16px 10px;text-align:center">
+                  <div style="width:40px;height:40px;margin:0 auto 10px;border-radius:11px;background:{{ cardBg }};display:flex;align-items:center;justify-content:center;color:#2563eb;box-shadow:0 2px 6px rgba(15,23,42,.08)"><i class="{{ s.icon }}"></i></div>
+                  <div style="font-size:11.5px;color:{{ muted }};line-height:1.3;min-height:30px">{{ s.label }}</div>
+                  <div style="font-size:20px;font-weight:800;font-family:Inter;margin-top:6px;color:{{ ink }}">{{ s.val }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== DASHBOARD 2 : SERVICE ===== -->
+      <sc-if value="{{ isService }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="{{ panelStyle }}">
+          <h3 style="{{ panelHb }}">ค้นหาเคสด้วยเลขคำสั่งซื้อ</h3>
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <div style="flex:1;display:flex;align-items:center;gap:10px;background:{{ softBg }};border:1px solid {{ line }};border-radius:10px;padding:11px 15px"><i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i><input value="GV-2569-084213" style="border:none;background:none;outline:none;flex:1;font-family:inherit;font-size:14px;color:{{ ink }}"></div>
+            <button style="background:#2563eb;color:#fff;border:none;padding:0 24px;border-radius:10px;font-family:inherit;font-weight:600;cursor:pointer">ค้นหา</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:16px">
+            <sc-for list="{{ caseDetail }}" as="c" hint-placeholder-count="5"><div style="background:{{ softBg }};border-radius:10px;padding:13px 15px"><div style="font-size:11.5px;color:{{ muted }}">{{ c.label }}</div><div style="font-size:14.5px;font-weight:700;margin-top:5px;color:{{ c.color }}">{{ c.val }}</div></div></sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
+          <sc-for list="{{ svcKpis }}" as="k" hint-placeholder-count="5"><div style="{{ cardStyle }}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:{{ muted }};font-weight:500">{{ k.label }}</span><div style="width:34px;height:34px;border-radius:9px;background:{{ k.iconBg }};color:{{ k.iconFg }};display:flex;align-items:center;justify-content:center"><i class="{{ k.icon }}"></i></div></div><div style="font-size:26px;font-weight:800;font-family:Inter;margin-top:10px;color:{{ k.valColor }}">{{ k.value }}</div><div style="font-size:11.5px;color:{{ muted }};margin-top:9px">{{ k.sub }}</div></div></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px">
+          <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">SKU ที่ถูกเคลมมากที่สุด</h3><div style="position:relative;height:280px;margin-top:10px"><canvas ref="{{ skuRef }}"></canvas></div></div>
+          <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">สัดส่วนประเภทปัญหา</h3><div style="position:relative;height:280px;margin-top:10px"><canvas ref="{{ issueRef }}"></canvas></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">แนวโน้มการเคลม</h3><div style="position:relative;height:250px;margin-top:10px"><canvas ref="{{ claimRef }}"></canvas></div></div>
+          <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">แนวโน้มคะแนนความพึงพอใจ</h3><div style="position:relative;height:250px;margin-top:10px"><canvas ref="{{ csatRef }}"></canvas></div></div>
+        </div>
+        <div style="{{ panelStyle }}">
+          <h3 style="{{ panelHb }}">คิวงานที่กำลังดำเนินการ</h3>
+          <table style="{{ tbl }}">
+            <thead><tr><th style="{{ th }}">คำสั่งซื้อ</th><th style="{{ th }}">SKU</th><th style="{{ th }}">ปัญหา</th><th style="{{ th }}">สถานะ</th><th style="{{ th }}">ผู้รับผิดชอบ</th><th style="{{ thR }}">Tracking</th></tr></thead>
+            <tbody><sc-for list="{{ queue }}" as="q" hint-placeholder-count="5"><tr style="{{ trStyle }}"><td style="{{ td }}"><b style="font-family:Inter">{{ q.order }}</b></td><td style="{{ td }}">{{ q.sku }}</td><td style="{{ td }}">{{ q.issue }}</td><td style="{{ td }}"><span style="padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;background:{{ q.stBg }};color:{{ q.stFg }}">{{ q.status }}</span></td><td style="{{ td }}">{{ q.owner }}</td><td style="{{ tdR }}"><span style="font-family:Inter">{{ q.track }}</span></td></tr></sc-for></tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== DASHBOARD 3 : RANKING ===== -->
+      <sc-if value="{{ isRanking }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <sc-for list="{{ podium }}" as="p" hint-placeholder-count="3">
+            <div style="{{ cardStyle }};text-align:center;border-top:4px solid {{ p.color }}">
+              <div style="font-size:30px">{{ p.medal }}</div>
+              <div style="width:64px;height:64px;margin:8px auto;border-radius:50%;background:{{ p.av }};display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px"><i class="fa-solid fa-user"></i></div>
+              <div style="font-size:16px;font-weight:700;color:{{ ink }}">{{ p.name }}</div>
+              <div style="font-size:12px;color:{{ muted }}">{{ p.role }}</div>
+              <div style="font-size:32px;font-weight:800;font-family:Inter;color:{{ p.color }};margin-top:8px">{{ p.score }}</div>
+              <div style="font-size:11.5px;color:{{ muted }}">Composite Score</div>
+              <div style="font-size:12px;font-weight:600;color:#16a34a;margin-top:6px"><i class="fa-solid fa-arrow-up"></i> {{ p.change }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px">
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">Leaderboard</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }};width:34px">อันดับ</th><th style="{{ th }}">พนักงาน</th><th style="{{ thR }}">คะแนนรวม</th><th style="{{ thR }}">ปิดการขาย</th><th style="{{ thR }}">ตอบแชท</th><th style="{{ thR }}">เปลี่ยนแปลง</th></tr></thead>
+              <tbody><sc-for list="{{ leaderboard }}" as="r" hint-placeholder-count="8"><tr style="{{ trStyle }}"><td style="{{ tdRank }}">{{ r.rank }}</td><td style="{{ td }}"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:26px;height:26px;border-radius:50%;background:{{ r.av }};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px"><i class="fa-solid fa-user"></i></span>{{ r.name }}</span></td><td style="{{ tdR }}"><b style="font-family:Inter;color:#2563eb">{{ r.score }}</b></td><td style="{{ tdR }}">{{ r.close }}</td><td style="{{ tdR }}">{{ r.speed }}</td><td style="{{ tdR }}"><span style="color:{{ r.chColor }};font-weight:600">{{ r.change }}</span></td></tr></sc-for></tbody>
+            </table>
+          </div>
+          <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">เปรียบเทียบกับค่าเฉลี่ยทีม</h3><div style="position:relative;height:290px;margin-top:10px"><canvas ref="{{ radarRef }}"></canvas></div></div>
+        </div>
+        <div style="{{ panelStyle }}"><h3 style="{{ panelHb }}">แนวโน้มอันดับย้อนหลัง (6 เดือน)</h3><div style="position:relative;height:270px;margin-top:10px"><canvas ref="{{ rankRef }}"></canvas></div></div>
+      </div>
+      </sc-if>
+
+      <!-- ===== CHAT ===== -->
+      <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <sc-for list="{{ chatKpis }}" as="k" hint-placeholder-count="4"><div style="{{ cardStyle }}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:{{ muted }};font-weight:500">{{ k.label }}</span><div style="width:34px;height:34px;border-radius:9px;background:{{ k.iconBg }};color:{{ k.iconFg }};display:flex;align-items:center;justify-content:center"><i class="{{ k.icon }}"></i></div></div><div style="font-size:26px;font-weight:800;font-family:Inter;margin-top:10px;color:{{ k.valColor }}">{{ k.value }}</div><div style="font-size:11.5px;color:{{ muted }};margin-top:9px">{{ k.sub }}</div></div></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">คิวการสนทนา</h3>
+            <table style="{{ tbl }}">
+              <thead><tr><th style="{{ th }}">ลูกค้า</th><th style="{{ th }}">ข้อความล่าสุด</th><th style="{{ th }}">ช่องทาง</th><th style="{{ th }}">สถานะ</th><th style="{{ thR }}">รอ</th><th style="{{ thR }}"></th></tr></thead>
+              <tbody><sc-for list="{{ chatThreads }}" as="c" hint-placeholder-count="5"><tr style="{{ trStyle }}"><td style="{{ td }}"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:26px;height:26px;border-radius:50%;background:{{ c.av }};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px"><i class="fa-solid fa-user"></i></span>{{ c.name }}</span></td><td style="{{ td }};color:{{ muted }}">{{ c.msg }}</td><td style="{{ td }}">{{ c.ch }}</td><td style="{{ td }}"><span style="padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;background:{{ c.stBg }};color:{{ c.stFg }}">{{ c.status }}</span></td><td style="{{ tdR }}">{{ c.time }}</td><td style="{{ tdR }}"><span style="color:#2563eb;cursor:pointer;font-weight:600">ตอบ</span></td></tr></sc-for></tbody>
+            </table>
+          </div>
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">ข้อความตอบด่วน</h3>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+              <sc-for list="{{ cannedReplies }}" as="r" hint-placeholder-count="5"><div style="background:{{ softBg }};border:1px solid {{ line }};border-radius:10px;padding:12px 14px;font-size:13px;color:{{ ink }};cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px" style-hover="border-color:#2563eb"><span>{{ r }}</span><i class="fa-regular fa-paper-plane" style="color:#2563eb"></i></div></sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== PRODUCT ===== -->
+      <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <sc-for list="{{ productKpis }}" as="k" hint-placeholder-count="4"><div style="{{ cardStyle }}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:12.5px;color:{{ muted }};font-weight:500">{{ k.label }}</span><div style="width:34px;height:34px;border-radius:9px;background:{{ k.iconBg }};color:{{ k.iconFg }};display:flex;align-items:center;justify-content:center"><i class="{{ k.icon }}"></i></div></div><div style="font-size:26px;font-weight:800;font-family:Inter;margin-top:10px;color:{{ k.valColor }}">{{ k.value }}</div><div style="font-size:11.5px;color:{{ muted }};margin-top:9px">{{ k.sub }}</div></div></sc-for>
+        </div>
+        <div style="{{ panelStyle }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="{{ panelHb }}">รายการสินค้า</h3><button style="background:#2563eb;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><i class="fa-solid fa-plus"></i> เพิ่มสินค้า</button></div>
+          <table style="{{ tbl }}">
+            <thead><tr><th style="{{ th }}">SKU</th><th style="{{ th }}">ชื่อสินค้า</th><th style="{{ th }}">หมวดหมู่</th><th style="{{ thR }}">ราคา</th><th style="{{ thR }}">คงเหลือ</th><th style="{{ th }}">สถานะ</th></tr></thead>
+            <tbody><sc-for list="{{ products }}" as="p" hint-placeholder-count="6"><tr style="{{ trStyle }}"><td style="{{ td }}"><b style="font-family:Inter">{{ p.sku }}</b></td><td style="{{ td }}">{{ p.name }}</td><td style="{{ td }};color:{{ muted }}">{{ p.cat }}</td><td style="{{ tdR }}">{{ p.price }}</td><td style="{{ tdR }}">{{ p.stock }}</td><td style="{{ td }}"><span style="padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;background:{{ p.stBg }};color:{{ p.stFg }}">{{ p.status }}</span></td></tr></sc-for></tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== STORE ===== -->
+      <sc-if value="{{ isStore }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+          <sc-for list="{{ stores }}" as="s" hint-placeholder-count="5">
+            <div style="{{ cardStyle }}">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:46px;height:46px;border-radius:12px;background:{{ s.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px"><i class="{{ s.icon }}"></i></div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:{{ ink }}">{{ s.name }}</div><span style="padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:{{ s.stBg }};color:{{ s.stFg }}">{{ s.status }}</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;text-align:center">
+                <div style="background:{{ softBg }};border-radius:10px;padding:12px 6px"><div style="font-size:11px;color:{{ muted }}">ยอดขาย</div><div style="font-size:16px;font-weight:800;font-family:Inter;color:{{ ink }};margin-top:4px">{{ s.sales }}</div></div>
+                <div style="background:{{ softBg }};border-radius:10px;padding:12px 6px"><div style="font-size:11px;color:{{ muted }}">แชท</div><div style="font-size:16px;font-weight:800;font-family:Inter;color:{{ ink }};margin-top:4px">{{ s.chats }}</div></div>
+                <div style="background:{{ softBg }};border-radius:10px;padding:12px 6px"><div style="font-size:11px;color:{{ muted }}">ปิดการขาย</div><div style="font-size:16px;font-weight:800;font-family:Inter;color:#16a34a;margin-top:4px">{{ s.rate }}</div></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== REPORT ===== -->
+      <sc-if value="{{ isReport }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+          <sc-for list="{{ reports }}" as="r" hint-placeholder-count="6">
+            <div style="{{ cardStyle }}" style-hover="transform:translateY(-3px);box-shadow:0 10px 26px rgba(15,23,42,.12)">
+              <div style="display:flex;align-items:flex-start;gap:13px">
+                <div style="width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px"><i class="{{ r.icon }}"></i></div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:{{ ink }}">{{ r.name }}</div><div style="font-size:12.5px;color:{{ muted }};margin-top:4px;line-height:1.4">{{ r.desc }}</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:13px;border-top:1px solid {{ line }}">
+                <span style="font-size:11.5px;color:{{ muted }}">{{ r.date }}</span>
+                <span style="display:flex;gap:14px;font-size:13px;font-weight:600"><span style="color:#2563eb;cursor:pointer"><i class="fa-solid fa-eye"></i> ดู</span><span style="color:#16a34a;cursor:pointer"><i class="fa-solid fa-download"></i> ดาวน์โหลด</span></span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== SETTING ===== -->
+      <sc-if value="{{ isSetting }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:gv-fade .4s ease;max-width:820px">
+        <sc-for list="{{ settings }}" as="g" hint-placeholder-count="3">
+          <div style="{{ panelStyle }}">
+            <h3 style="{{ panelHb }}">{{ g.group }}</h3>
+            <div style="display:flex;flex-direction:column;margin-top:6px">
+              <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid {{ line }}">
+                  <div style="width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:{{ softBg }};color:#2563eb;display:flex;align-items:center;justify-content:center"><i class="{{ it.icon }}"></i></div>
+                  <div style="flex:1"><div style="font-size:14px;font-weight:600;color:{{ ink }}">{{ it.name }}</div><div style="font-size:12px;color:{{ muted }};margin-top:2px">{{ it.desc }}</div></div>
+                  <i class="fa-solid fa-chevron-right" style="color:#94a3b8;font-size:13px;cursor:pointer"></i>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <div style="text-align:center;color:{{ muted }};font-size:12px;margin-top:26px">© 2569 Gadget Villa. All rights reserved.</div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1536,&quot;height&quot;:1010}}">
+class Component extends DCLogic {
+  state = { view:'sales', theme:'light', trend:'month', nav:true, sheet:null };
+
+  constructor(props){
+    super(props);
+    ['trend','sla','cust','sku','issue','claim','csat','radar','rank'].forEach(k=>this[k+'Ref']=React.createRef());
+    this.charts={};
+  }
+
+  componentDidMount(){ this.build(); this.__loadLive(); this.__startPolling(); }
+  componentWillUnmount(){ if(this.__timer){ clearInterval(this.__timer); this.__timer=null; } }
+  componentDidUpdate(_,p){ if(p.view!==this.state.view||p.theme!==this.state.theme||p.trend!==this.state.trend||p.sheet!==this.state.sheet){ this.build(); } }
+
+  // Real-time auto-refresh: re-fetch every GV_CONFIG.refreshMs ms (0 / missing = off).
+  __startPolling(){
+    const c=(typeof window!=='undefined'&&window.GV_CONFIG)?window.GV_CONFIG:null;
+    if(!c||!c.useLive||!c.webAppUrl) return;
+    const ms=Number(c.refreshMs)||0;
+    if(ms>0){ this.__timer=setInterval(()=>this.__loadLive(), ms); }
+  }
+  // Feature toggle: fetch live data from Google Sheets (Apps Script) when GV_CONFIG.useLive is on.
+  // On failure, state.sheet stays null and the built-in fallback data is used.
+  __loadLive(){
+    const c=(typeof window!=='undefined'&&window.GV_CONFIG)?window.GV_CONFIG:null;
+    if(!c||!c.useLive||!c.webAppUrl) return;
+    let url=c.webAppUrl; if(c.token) url+=(url.indexOf('?')<0?'?':'&')+'token='+encodeURIComponent(c.token);
+    url+=(url.indexOf('?')<0?'?':'&')+'_ts='+Date.now(); // cache-bust so refresh gets fresh data
+    fetch(url).then(r=>r.json()).then(res=>{ if(res&&res.ok&&res.data){ const j=JSON.stringify(res.data); if(j!==this.__lastSheetJSON){ this.__lastSheetJSON=j; this.setState({sheet:res.data}); } } })
+      .catch(()=>{});
+  }
+  // Return live rows for a tab (non-empty array) or null when live is off/unavailable.
+  __sheet(k){ const c=(typeof window!=='undefined'&&window.GV_CONFIG)?window.GV_CONFIG:null;
+    return (c&&c.useLive&&this.state.sheet&&Array.isArray(this.state.sheet[k])&&this.state.sheet[k].length)?this.state.sheet[k]:null; }
+
+  T(){ const d=this.state.theme==='dark'; return {
+    d, grid:d?'rgba(255,255,255,.08)':'rgba(15,23,42,.07)', tick:d?'#94a3b8':'#64748b' }; }
+
+  destroy(){ Object.values(this.charts).forEach(c=>{try{c.destroy()}catch(e){}}); this.charts={}; }
+
+  build(){
+    if(!window.Chart) { setTimeout(()=>this.build(),120); return; }
+    this.destroy();
+    const t=this.T(); Chart.defaults.font.family="'Noto Sans Thai','Inter',sans-serif";
+    Chart.defaults.color=t.tick;
+    const v=this.state.view;
+    if(v==='sales'){ this.trendChart(t); this.slaChart(t); this.custChart(t); }
+    if(v==='service'){ this.skuChart(t); this.issueChart(t); this.claimChart(t); this.csatChart(t); }
+    if(v==='ranking'){ this.radarChart(t); this.rankChart(t); }
+  }
+
+  mk(ref,cfg){ if(!ref.current) return; this.charts[ref.current.id||Math.random()]=new Chart(ref.current,cfg); }
+
+  trendChart(t){
+    const __base={
+      day:{labels:['1','5','10','15','20','25','30'],sales:[28,42,55,68,74,82,92].map(x=>x*1000),goal:[40,40,40,40,40,40,40].map(x=>x*1000)},
+      month:{labels:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],sales:[180,260,340,410,560,856,880,900,940,960,900,850].map(x=>x*1000),goal:[300,420,540,660,800,1000,1050,1100,1150,1180,1200,1200].map(x=>x*1000)},
+      year:{labels:['2565','2566','2567','2568','2569'],sales:[4.2,5.8,7.1,8.9,10.4].map(x=>x*1000000),goal:[5,6.5,8,10,12].map(x=>x*1000000)}
+    };
+    const __N=x=>{const n=parseFloat(String(x).replace(/[^0-9.\-]/g,''));return isNaN(n)?0:n;};
+    const __tr=this.__sheet('sales_trend'); let map=__base[this.state.trend];
+    if(__tr){ const pick=__tr.filter(r=>String(r.period)===this.state.trend); if(pick.length){ map={labels:pick.map(r=>r.label),sales:pick.map(r=>__N(r.sales)),goal:pick.map(r=>__N(r.goal))}; } }
+    this.mk(this.trendRef,{type:'line',data:{labels:map.labels,datasets:[
+      {label:'ยอดขาย (บาท)',data:map.sales,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.12)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#2563eb',borderWidth:2.5},
+      {label:'เป้าหมาย (บาท)',data:map.goal,borderColor:'#22c55e',borderDash:[6,5],tension:.4,pointRadius:0,borderWidth:2,fill:false}
+    ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{size:12}}}},scales:{x:{grid:{display:false},ticks:{color:t.tick}},y:{grid:{color:t.grid},ticks:{color:t.tick,callback:v=>v>=1000000?(v/1000000)+'M':v>=1000?(v/1000)+'K':v}}}}});
+  }
+  slaChart(t){ const L=this.__sheet('sla_response'); const lb=L?L.map(r=>r.label):['ภายใน 1 นาที','ภายใน 5 นาที','ภายใน 10 นาที','ภายใน 30 นาที','เกิน 30 นาที']; const dv=L?L.map(r=>parseFloat(String(r.pct).replace(/[^0-9.\-]/g,''))||0):[65.21,20.41,8.85,4.21,1.32]; this.mk(this.slaRef,{type:'doughnut',data:{labels:lb,datasets:[{data:dv,backgroundColor:['#22c55e','#2563eb','#f59e0b','#ef4444','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}}); }
+  custChart(t){ const L=this.__sheet('customer_split'); let dv=[7245,5600]; if(L&&L.length){ const nw=L.find(x=>/new|ใหม่/i.test(String(x.type)))||L[0]; const od=L.find(x=>x!==nw)||L[1]||{}; const N=x=>parseFloat(String(x).replace(/[^0-9.\-]/g,''))||0; dv=[N(nw.count),N(od.count)]; } this.mk(this.custRef,{type:'doughnut',data:{labels:['ลูกค้าใหม่','ลูกค้าเก่า'],datasets:[{data:dv,backgroundColor:['#2563eb','#22c55e'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}}); }
+
+  skuChart(t){ const L=this.__sheet('service_sku_returns'); const lb=L?L.map(r=>r.product):['iPhone Case A','USB-C Cable','Powerbank 10K','Screen Guard','Earbuds Pro','Charger 65W','Car Mount']; const dv=L?L.map(r=>parseFloat(String(r.returns).replace(/[^0-9.\-]/g,''))||0):[142,118,96,84,63,51,38]; this.mk(this.skuRef,{type:'bar',data:{labels:lb,datasets:[{label:'จำนวนเคลม',data:dv,backgroundColor:'#2563eb',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:t.grid},ticks:{color:t.tick}},y:{grid:{display:false},ticks:{color:t.tick}}}}}); }
+  issueChart(t){ const L=this.__sheet('service_issue_types'); const lb=L?L.map(r=>r.issue_type):['สินค้าชำรุด','ส่งผิดรุ่น','สินค้าไม่ครบ','ใช้งานไม่ได้','อื่นๆ']; const dv=L?L.map(r=>parseFloat(String(r.count).replace(/[^0-9.\-]/g,''))||0):[38,22,16,15,9]; this.mk(this.issueRef,{type:'doughnut',data:{labels:lb,datasets:[{data:dv,backgroundColor:['#ef4444','#f59e0b','#2563eb','#22c55e','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{usePointStyle:true,boxWidth:8,padding:12}}}}}); }
+  claimChart(t){ const L=this.__sheet('service_claims'); const N=x=>parseFloat(String(x).replace(/[^0-9.\-]/g,''))||0; const lb=L?L.map(r=>r.month):['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.']; const op=L?L.map(r=>N(r.opened)):[62,58,71,66,54,48]; const rs=L?L.map(r=>N(r.resolved)):[55,60,64,68,58,52]; this.mk(this.claimRef,{type:'bar',data:{labels:lb,datasets:[{label:'เปิดเคส',data:op,backgroundColor:'#f59e0b',borderRadius:5},{label:'ปิดเคส',data:rs,backgroundColor:'#22c55e',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}}},scales:{x:{grid:{display:false},ticks:{color:t.tick}},y:{grid:{color:t.grid},ticks:{color:t.tick}}}}}); }
+  csatChart(t){ const L=this.__sheet('service_csat'); const lb=L?L.map(r=>r.month):['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.']; const dv=L?L.map(r=>parseFloat(String(r.csat).replace(/[^0-9.\-]/g,''))||0):[4.1,4.2,4.0,4.4,4.5,4.6]; this.mk(this.csatRef,{type:'line',data:{labels:lb,datasets:[{label:'คะแนน CSAT',data:dv,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.12)',fill:true,tension:.4,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#22c55e'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:t.tick}},y:{min:3.5,max:5,grid:{color:t.grid},ticks:{color:t.tick}}}}}); }
+
+  radarChart(t){ const L=this.__sheet('ranking_radar'); let labels=['ปิดการขาย','ยอดขาย','ความเร็วตอบ','กู้คืนออเดอร์','รีวิวบวก']; let n1='น.ส. สุภาพร',n2='ค่าเฉลี่ยทีม',d1=[92,88,85,79,90],d2=[74,70,72,68,75]; if(L&&L.length){ const persons=[],axes=[]; L.forEach(r=>{if(persons.indexOf(r.person)<0)persons.push(r.person); if(axes.indexOf(r.axis)<0)axes.push(r.axis);}); const val=p=>axes.map(a=>{const h=L.find(x=>x.person===p&&x.axis===a);return h?(parseFloat(String(h.score).replace(/[^0-9.\-]/g,''))||0):0;}); labels=axes; n1=persons[0]||n1; d1=val(persons[0]); if(persons[1]){n2=persons[1];d2=val(persons[1]);} } this.mk(this.radarRef,{type:'radar',data:{labels:labels,datasets:[{label:n1,data:d1,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.2)',borderWidth:2,pointBackgroundColor:'#2563eb'},{label:n2,data:d2,borderColor:'#94a3b8',backgroundColor:'rgba(148,163,184,.15)',borderWidth:2,pointBackgroundColor:'#94a3b8'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}}},scales:{r:{angleLines:{color:t.grid},grid:{color:t.grid},pointLabels:{color:t.tick,font:{size:11}},ticks:{display:false},suggestedMin:0,suggestedMax:100}}}}); }
+  rankChart(t){ const col=['#2563eb','#22c55e','#f59e0b','#ef4444']; let names=['สุภาพร','กิตติพงษ์','จิรากา','ธนวัฒน์']; let months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.']; let data=[[5,4,3,2,1,1],[3,2,2,3,2,2],[6,5,5,4,4,3],[2,3,4,5,6,4]]; const L=this.__sheet('ranking_trend'); if(L&&L.length){ names=[];months=[]; L.forEach(r=>{if(names.indexOf(r.person)<0)names.push(r.person); if(months.indexOf(r.month)<0)months.push(r.month);}); data=names.map(p=>months.map(m=>{const h=L.find(x=>x.person===p&&x.month===m);return h?(parseFloat(String(h.rank_position).replace(/[^0-9.\-]/g,''))||0):null;})); }
+    this.mk(this.rankRef,{type:'line',data:{labels:months,datasets:names.map((n,i)=>({label:n,data:data[i],borderColor:col[i%col.length],backgroundColor:col[i%col.length],tension:.35,borderWidth:2.5,pointRadius:3}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}}},scales:{x:{grid:{display:false},ticks:{color:t.tick}},y:{reverse:true,min:1,max:8,grid:{color:t.grid},ticks:{color:t.tick,stepSize:1,callback:v=>'#'+v}}}}}); }
+
+  renderVals(){
+    const d=this.state.theme==='dark', v=this.state.view;
+    const pageBg=d?'#0f172a':'#f4f6fb', cardBg=d?'#1e293b':'#ffffff', ink=d?'#e2e8f0':'#1e293b',
+      muted=d?'#94a3b8':'#64748b', line=d?'#334155':'#eef1f6', softBg=d?'#0f172a':'#f4f6fb',
+      softBlue=d?'#1e3a5f':'#eff6ff', track=d?'#334155':'#eef1f6', softBg2=softBg;
+    const card=`background:${cardBg};border:1px solid ${line};border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(15,23,42,.05);transition:transform .2s,box-shadow .2s`;
+    const panel=`background:${cardBg};border:1px solid ${line};border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(15,23,42,.05)`;
+    const panelH=`font-size:15px;font-weight:700;color:${ink};padding-bottom:12px;border-bottom:1px solid ${line};margin-bottom:6px`;
+    const panelHb=`font-size:15px;font-weight:700;color:${ink}`;
+    const tbl=`width:100%;border-collapse:collapse;font-size:13px`;
+    const th=`text-align:left;padding:10px 6px;color:${muted};font-weight:600;font-size:12px;border-bottom:1px solid ${line}`;
+    const thR=th+`;text-align:right`, thC=th+`;text-align:center`;
+    const td=`padding:11px 6px;color:${ink};border-bottom:1px solid ${line}`;
+    const tdR=td+`;text-align:right;font-family:Inter;font-weight:500`;
+    const tdRank=td+`;color:${muted};font-weight:700;font-family:Inter`;
+    const tdPctCell=td+`;text-align:right;font-family:Inter;font-weight:600`;
+    const trStyle=``;
+    const pill=`display:flex;align-items:center;gap:9px;background:${cardBg};border:1px solid ${line};border-radius:9px;padding:9px 14px;font-size:13px;color:${ink};cursor:pointer;white-space:nowrap`;
+    const seeAll=`text-align:center;color:#2563eb;font-size:12.5px;font-weight:600;padding-top:12px;cursor:pointer`;
+
+    const nav = [
+      ['sales','สรุปผลการขาย','fa-solid fa-chart-line'],
+      ['service','บริการหลังการขาย','fa-solid fa-headset'],
+      ['ranking','Ranking พนักงาน','fa-solid fa-ranking-star'],
+      ['chat','แชท & การตอบกลับ','fa-regular fa-comment-dots'],
+      ['product','สินค้า','fa-solid fa-box'],
+      ['store','ร้านค้า','fa-solid fa-store'],
+      ['report','รายงาน','fa-solid fa-file-lines'],
+      ['setting','ตั้งค่า','fa-solid fa-gear'],
+    ];
+    const menu = nav.map(([id,label,icon])=>{
+      const active = id===v;
+      return {label,icon,go:(e)=>{e.preventDefault(); this.setState({view:id});},
+        style:`display:flex;align-items:center;gap:13px;padding:12px 15px;border-radius:10px;text-decoration:none;color:${active?'#fff':'#cdd5e5'};background:${active?'linear-gradient(90deg,#2563eb,#3b82f6)':'transparent'};font-weight:${active?'600':'500'};cursor:pointer;box-shadow:${active?'0 4px 12px rgba(37,99,235,.35)':'none'}`};
+    });
+
+    const themeBtn=(on)=>`flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;background:${on?'#2563eb':'transparent'};color:${on?'#fff':'#8b97ae'}`;
+
+    const kpis=[
+      {label:'เป้ายอดขาย (บาท)',value:'1,200,000',icon:'fa-solid fa-bullseye',iconBg:'#eff6ff',iconFg:'#2563eb',valColor:ink,sub:'เป้ารายเดือน'},
+      {label:'ยอดขายปัจจุบัน (บาท)',value:'856,420',icon:'fa-solid fa-cart-shopping',iconBg:'#ecfdf5',iconFg:'#16a34a',valColor:'#16a34a',sub:'อัปเดตล่าสุด 30 มิ.ย. 2569 23:59'},
+      {label:'% ทำยอดขาย',value:'71.37%',icon:'',iconBg:'#eff6ff',iconFg:'#2563eb',valColor:'#2563eb',bar:true,barPct:'71%',sub:'เทียบกับเป้ารายเดือน'},
+      {label:'ยอดที่ขาด/เกินเป้า (บาท)',value:'-343,580',icon:'fa-solid fa-arrow-trend-down',iconBg:'#fef2f2',iconFg:'#ef4444',valColor:'#ef4444',sub:'ต่ำกว่าเป้า'},
+      {label:'จำนวนแชท (ไม่ซ้ำ)',value:'12,845',icon:'fa-solid fa-comment',iconBg:'#f5f3ff',iconFg:'#7c3aed',valColor:'#7c3aed',sub:'ลูกค้าที่ทักเข้ามาทั้งหมด'},
+      {label:'ออเดอร์ที่เกิดขึ้น',value:'2,350',icon:'fa-solid fa-bag-shopping',iconBg:'#fff7ed',iconFg:'#ea580c',valColor:'#ea580c',sub:'คำสั่งซื้อที่สำเร็จ'},
+      {label:'อัตราแปลงแชทเป็นออเดอร์',value:'18.30%',icon:'fa-solid fa-chart-pie',iconBg:'#ecfeff',iconFg:'#0891b2',valColor:'#0891b2',sub:'เทียบจากแชททั้งหมด'},
+    ];
+
+    const topChat=[['Shopee - Gadget Villa','4,215','32.82%','100%'],['Lazada - Gadget Villa','3,256','25.34%','77%'],['TikTok Shop','2,154','16.78%','51%'],['Website','1,876','14.60%','44%'],['NocNoc','1,344','10.46%','32%']].map((r,i)=>({rank:i+1,name:r[0],n:r[1],pct:r[2],w:r[3]}));
+    const topSales=[['Shopee - Gadget Villa','420,560','49.15%','100%'],['Lazada - Gadget Villa','265,870','31.05%','63%'],['Website','98,450','11.50%','23%'],['TikTok Shop','55,320','6.46%','13%'],['NocNoc','16,220','1.89%','4%']].map((r,i)=>({rank:i+1,name:r[0],n:r[1],pct:r[2],w:r[3]}));
+    const avs=['#3b82f6','#f59e0b','#22c55e','#7c3aed','#ec4899'];
+    const staff=[['น.ส. สุภาพร','1,245','23.41%','245,600'],['นาย กิตติพงษ์','1,102','21.35%','198,750'],['น.ส. จิรากา','987','19.21%','165,320'],['นาย ธนวัฒน์','856','17.18%','142,300'],['น.ส. ปริญดา','743','16.22%','104,450']].map((r,i)=>({rank:i+1,name:r[0],chats:r[1],close:r[2],sales:r[3],av:avs[i]}));
+
+    const trendTabs=[['day','รายวัน'],['month','รายเดือน'],['year','รายปี']].map(([id,label])=>({label,go:()=>this.setState({trend:id}),
+      style:`padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;background:${this.state.trend===id?cardBg:'transparent'};color:${this.state.trend===id?'#2563eb':muted};box-shadow:${this.state.trend===id?'0 1px 3px rgba(15,23,42,.12)':'none'}`}));
+
+    const funnel=[
+      {label:'แชททั้งหมด (ไม่ซ้ำ)',val:'12,845',w:'100%',color:'#1d4ed8'},
+      {label:'แชทที่ได้รับการตอบรับ',val:'9,256 (72.03%)',w:'82%',color:'#2563eb'},
+      {label:'ขึ้นการส่งซื้อ',val:'3,125 (24.34%)',w:'64%',color:'#38bdf8'},
+      {label:'ออเดอร์ที่สำเร็จ',val:'2,350 (18.30%)',w:'46%',color:'#22c55e'},
+    ];
+    const sla=[['ภายใน 1 นาที','65.21%','#22c55e'],['ภายใน 5 นาที','20.41%','#2563eb'],['ภายใน 10 นาที','8.85%','#f59e0b'],['ภายใน 30 นาที','4.21%','#ef4444'],['เกิน 30 นาที','1.32%','#94a3b8']].map(r=>({label:r[0],pct:r[1],color:r[2]}));
+
+    const heatDays=['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'];
+    const heatColor=v=>{const c=['#dbeafe','#bfdbfe','#93c5fd','#60a5fa','#3b82f6','#1d4ed8'];return c[Math.min(5,Math.floor(v/18))];};
+    const heat=['00:00-04:00','04:00-08:00','08:00-12:00','12:00-16:00','16:00-20:00','20:00-24:00'].map((time,ri)=>({time,cells:heatDays.map((_,ci)=>{const base=[8,12,55,88,72,45][ri];const val=Math.max(2,Math.round(base*(0.6+0.5*Math.sin(ci+ri))));return {v:val,color:heatColor(val)};})}));
+
+    const heatMonths=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+    const cg=v=>{const p=parseFloat(v);const a=Math.min(1,(p-10)/20);return {color:`rgba(37,99,235,${0.12+a*0.7})`,fg:a>0.55?'#fff':'#1e40af'};};
+    const closeGrid=[['Shopee','16.2%','17.8%','18.3%','19.6%','20.1%','21.4%'],['Lazada','15.1%','16.3%','17.2%','18.1%','19.8%','20.8%'],['Website','22.3%','23.1%','24.6%','25.3%','26.0%','27.5%'],['TikTok Shop','12.2%','13.4%','14.1%','15.2%','15.9%','16.7%'],['NocNoc','10.3%','11.6%','12.0%','12.8%','13.5%','14.1%']].map(r=>({name:r[0],cells:r.slice(1).map(x=>({v:x,...cg(x)}))}));
+
+    const summary=[
+      {label:'ยอดขายรวม (บาท)',val:'856,420',icon:'fa-regular fa-face-smile'},
+      {label:'ออเดอร์รวม',val:'2,350',icon:'fa-solid fa-bag-shopping'},
+      {label:'จำนวนแชทรวม (ไม่ซ้ำ)',val:'12,845',icon:'fa-regular fa-comment-dots'},
+      {label:'ลูกค้าไม่พอใจ (รีวิวเชิงลบ)',val:'185',icon:'fa-solid fa-users'},
+    ];
+
+    // Dashboard 2
+    const caseDetail=[
+      {label:'สถานะเคส',val:'กำลังดำเนินการ',color:'#ea580c'},
+      {label:'SKU',val:'IPH-CASE-A12',color:ink},
+      {label:'ปัญหาที่พบ',val:'สินค้าชำรุด',color:ink},
+      {label:'วิธีแก้ไข',val:'เปลี่ยนสินค้าใหม่',color:ink},
+      {label:'Tracking Number',val:'TH6820394821',color:'#2563eb'},
+    ];
+    const svcKpis=[
+      {label:'จำนวนเคสทั้งหมด',value:'1,284',icon:'fa-solid fa-clipboard-list',iconBg:'#eff6ff',iconFg:'#2563eb',valColor:ink,sub:'ในเดือนนี้'},
+      {label:'เคสที่ยังไม่ปิด',value:'156',icon:'fa-solid fa-hourglass-half',iconBg:'#fff7ed',iconFg:'#ea580c',valColor:'#ea580c',sub:'รอดำเนินการ'},
+      {label:'เวลาเฉลี่ยดำเนินการ',value:'2.4 วัน',icon:'fa-regular fa-clock',iconBg:'#f5f3ff',iconFg:'#7c3aed',valColor:'#7c3aed',sub:'ต่อเคส'},
+      {label:'ค่าขนส่งรวม (บาท)',value:'48,320',icon:'fa-solid fa-truck',iconBg:'#ecfeff',iconFg:'#0891b2',valColor:'#0891b2',sub:'เดือนนี้'},
+      {label:'คะแนนความพึงพอใจ',value:'4.6 / 5',icon:'fa-solid fa-star',iconBg:'#ecfdf5',iconFg:'#16a34a',valColor:'#16a34a',sub:'จาก 984 รีวิว'},
+    ];
+    const stMap={'กำลังดำเนินการ':['#fff7ed','#ea580c'],'รอลูกค้า':['#eff6ff','#2563eb'],'รอสินค้า':['#f5f3ff','#7c3aed'],'ใกล้ปิด':['#ecfdf5','#16a34a']};
+    const queue=[['GV-2569-084213','IPH-CASE-A12','สินค้าชำรุด','กำลังดำเนินการ','สุภาพร','TH6820394821'],['GV-2569-084198','USB-C-2M','ส่งผิดรุ่น','รอสินค้า','กิตติพงษ์','TH6820394765'],['GV-2569-084177','PWB-10K','ใช้งานไม่ได้','รอลูกค้า','จิรากา','TH6820394602'],['GV-2569-084155','SCR-GD-13','สินค้าไม่ครบ','ใกล้ปิด','ธนวัฒน์','TH6820394511'],['GV-2569-084140','EAR-PRO-X','สินค้าชำรุด','กำลังดำเนินการ','ปริญดา','TH6820394488']].map(r=>({order:r[0],sku:r[1],issue:r[2],status:r[3],owner:r[4],track:r[5],stBg:stMap[r[3]][0],stFg:stMap[r[3]][1]}));
+
+    // Dashboard 3
+    const podium=[
+      {medal:'🥇',name:'น.ส. สุภาพร',role:'Customer Service',score:'92.4',change:'+2 อันดับ',color:'#f59e0b',av:'#3b82f6'},
+      {medal:'🥈',name:'นาย กิตติพงษ์',role:'Customer Service',score:'88.1',change:'+1 อันดับ',color:'#94a3b8',av:'#f59e0b'},
+      {medal:'🥉',name:'น.ส. จิรากา',role:'Customer Service',score:'84.7',change:'+3 อันดับ',color:'#d97706',av:'#22c55e'},
+    ];
+    const lbAv=['#3b82f6','#f59e0b','#22c55e','#7c3aed','#ec4899','#0891b2','#ef4444','#64748b'];
+    const leaderboard=[['น.ส. สุภาพร','92.4','23.4%','1.2 นาที','+2'],['นาย กิตติพงษ์','88.1','21.4%','1.5 นาที','+1'],['น.ส. จิรากา','84.7','19.2%','1.8 นาที','+3'],['นาย ธนวัฒน์','80.3','17.2%','2.1 นาที','-1'],['น.ส. ปริญดา','76.5','16.2%','2.4 นาที','0'],['นาย วีรภัทร','72.1','14.8%','2.9 นาที','-2'],['น.ส. อรพรรณ','68.9','13.5%','3.2 นาที','+1'],['นาย ชัยวัฒน์','64.2','12.1%','3.8 นาที','-1']].map((r,i)=>{const c=parseInt(r[4]);return {rank:i+1,name:r[0],score:r[1],close:r[2],speed:r[3],change:c>0?'▲ '+c:(c<0?'▼ '+Math.abs(c):'—'),chColor:c>0?'#16a34a':(c<0?'#ef4444':muted),av:lbAv[i]};});
+
+    // Chat
+    const chatKpis=[
+      {label:'แชทที่ยังไม่ตอบ',value:'42',icon:'fa-solid fa-inbox',iconBg:'#fef2f2',iconFg:'#ef4444',valColor:'#ef4444',sub:'ต้องดำเนินการ'},
+      {label:'กำลังสนทนา',value:'128',icon:'fa-solid fa-comments',iconBg:'#eff6ff',iconFg:'#2563eb',valColor:ink,sub:'อยู่ในคิว'},
+      {label:'เวลาตอบเฉลี่ย',value:'1.8 นาที',icon:'fa-regular fa-clock',iconBg:'#f5f3ff',iconFg:'#7c3aed',valColor:'#7c3aed',sub:'วันนี้'},
+      {label:'ตอบแล้ววันนี้',value:'1,024',icon:'fa-solid fa-check-double',iconBg:'#ecfdf5',iconFg:'#16a34a',valColor:'#16a34a',sub:'ปิดสนทนา 892'},
+    ];
+    const cstMap={'ยังไม่ตอบ':['#fef2f2','#ef4444'],'กำลังคุย':['#eff6ff','#2563eb'],'รอลูกค้า':['#fff7ed','#ea580c'],'ปิดแล้ว':['#ecfdf5','#16a34a']};
+    const chatThreads=[['สมชาย ใจดี','สอบถามสต็อก iPhone Case','Shopee','ยังไม่ตอบ','2 นาที'],['Naruedee K.','ขอเลขพัสดุค่ะ','Lazada','กำลังคุย','5 นาที'],['ธีรพงษ์','ของยังไม่ได้รับ','TikTok Shop','รอลูกค้า','12 นาที'],['Ploy P.','สินค้ามีสีอื่นไหม','Website','กำลังคุย','18 นาที'],['วิชัย ม.','ขอบคุณครับ ได้รับแล้ว','Shopee','ปิดแล้ว','1 ชม.']].map((r,i)=>({name:r[0],msg:r[1],ch:r[2],status:r[3],time:r[4],stBg:cstMap[r[3]][0],stFg:cstMap[r[3]][1],av:['#3b82f6','#f59e0b','#22c55e','#7c3aed','#ec4899'][i]}));
+    const cannedReplies=['สวัสดีค่ะ ยินดีให้บริการค่ะ 😊','ขอเลขคำสั่งซื้อเพื่อตรวจสอบให้หน่อยได้ไหมคะ','สินค้าพร้อมจัดส่งภายใน 24 ชม. ค่ะ','ขอบคุณที่อุดหนุนนะคะ 🙏','รบกวนแจ้งที่อยู่จัดส่งอีกครั้งค่ะ'];
+
+    // Product
+    const productKpis=[
+      {label:'สินค้าทั้งหมด',value:'1,842',icon:'fa-solid fa-box',iconBg:'#eff6ff',iconFg:'#2563eb',valColor:ink,sub:'SKU ที่ใช้งาน'},
+      {label:'สต็อกใกล้หมด',value:'37',icon:'fa-solid fa-triangle-exclamation',iconBg:'#fff7ed',iconFg:'#ea580c',valColor:'#ea580c',sub:'ต่ำกว่าจุดสั่งซื้อ'},
+      {label:'สินค้าหมด',value:'12',icon:'fa-solid fa-ban',iconBg:'#fef2f2',iconFg:'#ef4444',valColor:'#ef4444',sub:'ต้องเติมด่วน'},
+      {label:'มูลค่าสต็อกรวม',value:'฿4.28M',icon:'fa-solid fa-warehouse',iconBg:'#ecfdf5',iconFg:'#16a34a',valColor:'#16a34a',sub:'ราคาต้นทุน'},
+    ];
+    const stkMap={'พร้อมขาย':['#ecfdf5','#16a34a'],'ใกล้หมด':['#fff7ed','#ea580c'],'หมด':['#fef2f2','#ef4444']};
+    const products=[['IPH-CASE-A12','เคส iPhone 15 Pro ใส','อุปกรณ์เสริม','฿290','1,204','พร้อมขาย'],['USB-C-2M','สาย USB-C 2 เมตร','สายชาร์จ','฿190','86','ใกล้หมด'],['PWB-10K','Powerbank 10,000mAh','แบตสำรอง','฿590','0','หมด'],['SCR-GD-13','ฟิล์มกระจก iPhone 13','ฟิล์ม','฿150','2,450','พร้อมขาย'],['EAR-PRO-X','หูฟัง Earbuds Pro','หูฟัง','฿1,290','42','ใกล้หมด'],['CHG-65W','อะแดปเตอร์ 65W','ที่ชาร์จ','฿790','318','พร้อมขาย']].map(r=>({sku:r[0],name:r[1],cat:r[2],price:r[3],stock:r[4],status:r[5],stBg:stkMap[r[5]][0],stFg:stkMap[r[5]][1]}));
+
+    // Store
+    const stores=[['Shopee - Gadget Villa','fa-bag-shopping','#ee4d2d','420,560','4,215','21.4%','เปิด'],['Lazada - Gadget Villa','fa-bag-shopping','#0f146d','265,870','3,256','20.8%','เปิด'],['TikTok Shop','fa-music','#000000','55,320','2,154','16.7%','เปิด'],['Website','fa-globe','#2563eb','98,450','1,876','27.5%','เปิด'],['NocNoc','fa-store','#16a34a','16,220','1,344','14.1%','ปิดชั่วคราว']].map(r=>({name:r[0],icon:'fa-solid '+r[1],color:r[2],sales:r[3],chats:r[4],rate:r[5],status:r[6],stBg:r[6]==='เปิด'?'#ecfdf5':'#f1f5f9',stFg:r[6]==='เปิด'?'#16a34a':'#64748b'}));
+
+    // Report
+    const reports=[
+      {name:'รายงานยอดขายรายเดือน',desc:'สรุปยอดขายแยกตามร้านค้าและช่องทาง',icon:'fa-solid fa-chart-column',color:'#2563eb',date:'อัปเดต 30 มิ.ย. 2569'},
+      {name:'รายงานสินค้าคงคลัง',desc:'สถานะสต็อกและสินค้าใกล้หมด',icon:'fa-solid fa-boxes-stacked',color:'#16a34a',date:'อัปเดต 30 มิ.ย. 2569'},
+      {name:'รายงานการเคลม',desc:'สรุปเคสบริการหลังการขาย',icon:'fa-solid fa-clipboard-check',color:'#ea580c',date:'อัปเดต 29 มิ.ย. 2569'},
+      {name:'รายงานผลงานพนักงาน',desc:'KPI และอันดับพนักงานบริการ',icon:'fa-solid fa-user-check',color:'#7c3aed',date:'อัปเดต 30 มิ.ย. 2569'},
+      {name:'รายงานความพึงพอใจ',desc:'คะแนน CSAT และรีวิวลูกค้า',icon:'fa-solid fa-face-smile',color:'#0891b2',date:'อัปเดต 28 มิ.ย. 2569'},
+      {name:'รายงานภาษีขาย',desc:'สรุปยอดสำหรับยื่นภาษี',icon:'fa-solid fa-receipt',color:'#ef4444',date:'อัปเดต 30 มิ.ย. 2569'},
+    ];
+
+    // Setting
+    const mkI=arr=>arr.map(x=>({name:x[0],desc:x[1],icon:x[2]}));
+    const settings=[
+      {group:'บัญชีและองค์กร',items:mkI([['ข้อมูลบริษัท','ชื่อ ที่อยู่ เลขผู้เสียภาษี','fa-solid fa-building'],['ผู้ใช้งานและสิทธิ์','จัดการทีมและบทบาท','fa-solid fa-users-gear'],['การเชื่อมต่อร้านค้า','Shopee, Lazada, TikTok','fa-solid fa-plug']])},
+      {group:'การแจ้งเตือน',items:mkI([['แจ้งเตือนแชทใหม่','เสียงและ push notification','fa-solid fa-bell'],['แจ้งเตือนสต็อกต่ำ','ตั้งจุดสั่งซื้ออัตโนมัติ','fa-solid fa-triangle-exclamation'],['สรุปรายวันทางอีเมล','ส่งทุกเช้า 08:00','fa-regular fa-envelope']])},
+      {group:'ระบบ',items:mkI([['เป้าหมายยอดขาย','กำหนดเป้ารายเดือน','fa-solid fa-bullseye'],['ธีมและการแสดงผล','โหมดสว่าง/มืด','fa-solid fa-palette'],['สำรองข้อมูล','ส่งออกและกู้คืน','fa-solid fa-database']])},
+    ];
+
+    // ===== LIVE DATA OVERRIDE (READ) — GV_CONFIG.useLive toggles this; the arrays above stay as fallback =====
+    const __get = k => this.__sheet(k);
+    const __num = x => { const n=parseFloat(String(x).replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; };
+    const __ovl = (rows, base, map) => rows.map((r,i)=>Object.assign({}, base[i]||base[base.length-1]||{}, map(r,i)));
+    const __barw = (p, first) => { const b=__num(first)||__num(p)||1; return Math.round(__num(p)/b*100)+'%'; };
+    const __closeGridLive = rows => {
+      const months=[]; rows.forEach(r=>{ if(months.indexOf(r.month)<0) months.push(r.month); });
+      const byStore={}; const order=[];
+      rows.forEach(r=>{ if(!byStore[r.store]){ byStore[r.store]={}; order.push(r.store);} byStore[r.store][r.month]=r.pct; });
+      return order.map(name=>({ name, cells: months.map(m=>{ const v=byStore[name][m]!==undefined?String(byStore[name][m]):'0%'; return Object.assign({v}, cg(v)); }) }));
+    };
+    const __heatLive = rows => {
+      const slots=[]; rows.forEach(r=>{ if(slots.indexOf(r.timeslot)<0) slots.push(r.timeslot); });
+      return slots.map(time=>({ time, cells: heatDays.map(day=>{ const hit=rows.find(x=>x.timeslot===time&&String(x.day)===String(day)); const val=hit?Math.round(__num(hit.value)):0; return {v:val, color:heatColor(val)}; }) }));
+    };
+    const __settingsLive = rows => {
+      const groups=[]; const idx={};
+      rows.forEach(r=>{ if(idx[r.group]===undefined){ idx[r.group]=groups.length; groups.push({group:r.group, items:[]}); }
+        let icon='fa-solid fa-gear';
+        settings.forEach(gp=>gp.items.forEach(it=>{ if(it.name===r.name) icon=it.icon; }));
+        groups[idx[r.group]].items.push({name:r.name, desc:r.desc, icon});
+      });
+      return groups;
+    };
+    let R_kpis=kpis, R_topChat=topChat, R_topSales=topSales, R_staff=staff, R_funnel=funnel, R_sla=sla,
+        R_closeGrid=closeGrid, R_summary=summary, R_heat=heat, R_svcKpis=svcKpis, R_queue=queue, R_caseDetail=caseDetail,
+        R_leaderboard=leaderboard, R_podium=podium, R_chatKpis=chatKpis, R_chatThreads=chatThreads, R_cannedReplies=cannedReplies,
+        R_products=products, R_productKpis=productKpis, R_stores=stores, R_reports=reports, R_settings=settings,
+        R_custNew=7245, R_custOld=5600;
+    { let g;
+      if(g=__get('sales_kpi'))        R_kpis      = __ovl(g,kpis,     r=>({label:r.label,value:r.value,sub:r.sub}));
+      if(g=__get('top_chat'))         R_topChat   = g.map((r,i)=>({rank:i+1,name:r.name,n:r.chats,pct:r.pct,w:__barw(r.pct,g[0].pct)}));
+      if(g=__get('top_sales'))        R_topSales  = g.map((r,i)=>({rank:i+1,name:r.name,n:r.sales,pct:r.pct,w:__barw(r.pct,g[0].pct)}));
+      if(g=__get('staff_summary'))    R_staff     = g.map((r,i)=>({rank:i+1,name:r.name,chats:r.chats,close:r.close_rate,sales:r.sales,av:avs[i%avs.length]}));
+      if(g=__get('sales_funnel'))     R_funnel    = __ovl(g,funnel,   r=>({label:r.label,val:r.value}));
+      if(g=__get('sla_response'))     R_sla       = __ovl(g,sla,      r=>({label:r.label,pct:r.pct}));
+      if(g=__get('store_close_grid')) R_closeGrid = __closeGridLive(g);
+      if(g=__get('sales_summary'))    R_summary   = __ovl(g,summary,  r=>({label:r.label,val:r.value}));
+      if(g=__get('chat_heatmap'))     R_heat      = __heatLive(g);
+      if(g=__get('customer_split')){ const nw=g.find(x=>/new|ใหม่/i.test(String(x.type)))||g[0]||{}; const od=g.find(x=>x!==nw)||g[1]||{}; R_custNew=__num(nw.count)||R_custNew; R_custOld=__num(od.count)||R_custOld; }
+      if(g=__get('service_kpi'))      R_svcKpis   = __ovl(g,svcKpis,  r=>({label:r.label,value:r.value,sub:r.sub}));
+      if(g=__get('service_queue'))    R_queue     = g.map(r=>{ const s=stMap[r.status]||['#f1f5f9','#64748b']; return {order:r.order,sku:r.sku,issue:r.issue,status:r.status,owner:r.owner,track:r.track,stBg:s[0],stFg:s[1]}; });
+      if(R_queue.length){ const q=R_queue[0]; const vals=[q.issue,q.sku,q.status,q.owner,q.track]; R_caseDetail = caseDetail.map((c,i)=>Object.assign({},c,{val:vals[i]!==undefined?vals[i]:c.val})); }
+      if(g=__get('ranking_leaderboard')) R_leaderboard = g.map((r,i)=>{ const c=parseInt(r.change); return {rank:i+1,name:r.name,score:r.score,close:r.close_rate,speed:r.speed,change:c>0?'▲ '+c:(c<0?'▼ '+Math.abs(c):'—'),chColor:c>0?'#16a34a':(c<0?'#ef4444':muted),av:lbAv[i%lbAv.length]}; });
+      R_podium = R_leaderboard.slice(0,3).map((r,i)=>Object.assign({},podium[i]||{},{name:r.name,score:r.score}));
+      if(g=__get('chat_kpi'))         R_chatKpis  = __ovl(g,chatKpis, r=>({label:r.label,value:r.value,sub:r.sub}));
+      if(g=__get('chat_threads'))     R_chatThreads = g.map((r,i)=>{ const s=cstMap[r.status]||['#f1f5f9','#64748b']; return {name:r.name,msg:r.msg,ch:r.channel,status:r.status,time:r.time,stBg:s[0],stFg:s[1],av:avs[i%avs.length]}; });
+      if(g=__get('canned_replies'))   R_cannedReplies = g.map(r=>r.text);
+      if(g=__get('product_kpi'))      R_productKpis = __ovl(g,productKpis, r=>({label:r.label,value:r.value,sub:r.sub}));
+      if(g=__get('products'))         R_products = g.map(r=>{ const s=stkMap[r.status]||['#f1f5f9','#64748b']; return {sku:r.sku,name:r.name,cat:r.category,price:r.price,stock:r.stock,status:r.status,stBg:s[0],stFg:s[1]}; });
+      if(g=__get('stores'))           R_stores = g.map(r=>{ const base=stores.find(s=>s.name===r.name)||stores[0]||{}; const ok=/พร้อม/.test(String(r.status)); return Object.assign({},base,{name:r.name,sales:r.sales,chats:r.chats,rate:r.rate,status:r.status,stBg:ok?'#ecfdf5':'#f1f5f9',stFg:ok?'#16a34a':'#64748b'}); });
+      if(g=__get('reports'))          R_reports = __ovl(g,reports, r=>({name:r.name,desc:r.desc,date:r.date}));
+      if(g=__get('settings'))         R_settings = __settingsLive(g);
+    }
+    const __ttl=(R_custNew||0)+(R_custOld||0)||1;
+    const custNewTxt=Number(R_custNew).toLocaleString('en-US')+' ('+(R_custNew/__ttl*100).toFixed(2)+'%)';
+    const custOldTxt=Number(R_custOld).toLocaleString('en-US')+' ('+(R_custOld/__ttl*100).toFixed(2)+'%)';
+
+    return {
+      pageBg,cardBg,ink,muted,line,softBg,softBlue,track,
+      cardStyle:card,panelStyle:panel,panelH,panelHb,tbl,th,thR,thC,td,tdR,tdRank,tdPctCell,trStyle,pill,seeAll,
+      navW:this.state.nav?'232px':'74px', expanded:this.state.nav,
+      collapseIcon:this.state.nav?'fa-solid fa-angles-left':'fa-solid fa-angles-right',
+      toggleNav:()=>this.setState({nav:!this.state.nav}),
+      menu, setLight:()=>this.setState({theme:'light'}), setDark:()=>this.setState({theme:'dark'}),
+      lightBtn:themeBtn(!d), darkBtn:themeBtn(d),
+      isSales:v==='sales', isService:v==='service', isRanking:v==='ranking',
+      isChat:v==='chat', isProduct:v==='product', isStore:v==='store', isReport:v==='report', isSetting:v==='setting',
+      headTitle:({sales:'สรุปผลการขาย',service:'บริการหลังการขาย',ranking:'Ranking พนักงานบริการลูกค้า',chat:'แชท & การตอบกลับ',product:'สินค้า',store:'ร้านค้า',report:'รายงาน',setting:'ตั้งค่า'})[v],
+      headIcon:({sales:'fa-solid fa-chart-line',service:'fa-solid fa-headset',ranking:'fa-solid fa-ranking-star',chat:'fa-regular fa-comment-dots',product:'fa-solid fa-box',store:'fa-solid fa-store',report:'fa-solid fa-file-lines',setting:'fa-solid fa-gear'})[v],
+      chatKpis:R_chatKpis,chatThreads:R_chatThreads,cannedReplies:R_cannedReplies,products:R_products,productKpis:R_productKpis,stores:R_stores,reports:R_reports,settings:R_settings,
+      badge:(bg,fg)=>`padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600;background:${bg};color:${fg}`,
+      kpis:R_kpis,topChat:R_topChat,topSales:R_topSales,staff:R_staff,trendTabs,funnel:R_funnel,sla:R_sla,heatDays,heat:R_heat,heatMonths,closeGrid:R_closeGrid,summary:R_summary,custNewTxt,custOldTxt,
+      trendRef:this.trendRef,slaRef:this.slaRef,custRef:this.custRef,
+      caseDetail:R_caseDetail,svcKpis:R_svcKpis,queue:R_queue,skuRef:this.skuRef,issueRef:this.issueRef,claimRef:this.claimRef,csatRef:this.csatRef,
+      podium:R_podium,leaderboard:R_leaderboard,radarRef:this.radarRef,rankRef:this.rankRef,
+    };
+  }
+}
+</script>
+</body>
+</html>
